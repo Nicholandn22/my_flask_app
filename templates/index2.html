@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data UKDW</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(90deg, #7ab2d3, #4a628a);
+        padding: 20px;
+      }
+
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(90deg, #007bff, #6f42c1);
+        /*background: linear-gradient(90deg, #03346E, #021526);*/
+        color: white;
+        text-align: center;
+        padding: 15px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-weight: 700;
+        z-index: 1000;
+      }
+
+      footer {
+        background: linear-gradient(90deg, #007bff, #6f42c1);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+        letter-spacing: 1px;
+      }
+
+      .headcontainer {
+        display: flex;
+        justify-content: space-between;
+        width: 90%;
+        margin: 100px auto 0;
+        gap: 20px;
+      }
+
+      /* Container Styles */
+      .container,
+      .container2 {
+        background-color: #cbdceb;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        max-width: 400px;
+        align-self: flex-start;
+      }
+
+      .container {
+        padding-top: 45px;
+        padding-bottom: 100px;
+      }
+
+      /* Pop-up on Hover */
+      .container:hover,
+      .container2:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      h2 {
+        text-align: center;
+        margin-bottom: 40px;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      select,
+      input[type="file"],
+      button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+      }
+
+      .charts-container h3 {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      button {
+        background-color: #7ab2d3;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+        font-weight: 700;
+      }
+
+      button:hover {
+        background-color: #608bc1;
+      }
+
+      .reset-button {
+        background-color: #4a628a;
+      }
+
+      .reset-button:hover {
+        background-color: #1e3e62;
+      }
+
+      /* Distribusi Data Section Styling */
+      .container2 {
+        max-width: 1200px;
+      }
+
+      /* Flexbox for charts */
+      .charts-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 40px;
+        margin-top: 20px;
+      }
+
+      .chart-container {
+        flex: 1; /* Ensure it takes available width */
+        height: 400px;
+        margin-top: 15px;
+      }
+
+      h3 span {
+        color: #007bff;
+        font-weight: 700;
+      }
+
+      .icon {
+        font-size: 2rem;
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Data UKDW X <strong>ROBOPARK</strong></h1>
+    </header>
+
+    <div class="headcontainer">
+      <!-- Upload Container -->
+      <div class="container">
+        <h2>Upload Your Content</h2>
+        <div class="form-group">
+          <label for="file-upload">Choose File:</label>
+          <input type="file" id="file-upload" />
+        </div>
+        <div class="form-group">
+          <label for="gender-select">Choose Gender:</label>
+          <select id="gender-select">
+            <option value="Pria">Male</option>
+            <option value="Wanita">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="age-select">Choose Age Range:</label>
+          <select id="age-select">
+            <option value="1-10">1-10</option>
+            <option value="11-20">11-20</option>
+            <option value="21-30">21-30</option>
+            <option value="31-40">31-40</option>
+            <option value="41-50">41-50</option>
+            <option value="51-60">51-60</option>
+            <option value="61-70">61-70</option>
+            <option value="71-80">71-80</option>
+          </select>
+        </div>
+        <button id="upload-button">Upload</button>
+        <button class="reset-button" id="reset-button">Reset</button>
+      </div>
+
+      <!-- Distribusi Data Section -->
+      <div class="container2">
+        <h2>Data Distribution</h2>
+        <h3>
+          Total Data Inputed Today:
+          <span id="total-today">{{ data.total_today }}</span>
+        </h3>
+        <div class="charts-container">
+          <div class="chart-container">
+            <canvas id="genderChart"></canvas>
+            <h3>Gender Chart</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="usiaChart"></canvas>
+            <h3>Age Chart</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="emotionChart"></canvas>
+            <h3>Emotion Chart</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer
+      style="
+        text-align: center;
+        padding: 15px;
+        background-color: #007bff;
+        color: white;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        margin-top: 20px;
+        left: 0;
+        right: 0;
+      "
+    >
+      <p style="margin: 0">&copy; 2024 FTI UKDW. All rights reserved.</p>
+    </footer>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1040.0.min.js"></script>
+
+    <script>
+        const dataFromFlask = {{ data | tojson }};
+
+        const ctxGender = document.getElementById('genderChart').getContext('2d');
+        const ctxUsia = document.getElementById('usiaChart').getContext('2d');
+        const ctxEmotion = document.getElementById('emotionChart').getContext('2d');
+
+        const genderChart = new Chart(ctxGender, {
+            type: 'pie',
+            data: {
+                labels: dataFromFlask.gender.labels,
+                datasets: [{
+                    data: dataFromFlask.gender.values,
+                    backgroundColor: ['#36A2EB', '#FF6384'],
+                }]
+            }
+        });
+
+        const usiaChart = new Chart(ctxUsia, {
+            type: 'pie',
+            data: {
+                labels: dataFromFlask.usia.labels,
+                datasets: [{
+                    data: dataFromFlask.usia.values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                }]
+            }
+        });
+
+        const emotionChart = new Chart(ctxEmotion, {
+            type: 'pie',
+            data: {
+                labels: dataFromFlask.emotions.labels,
+                datasets: [{
+                    data: dataFromFlask.emotions.values,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                }]
+            }
+        });
+
+
+        AWS.config.update({
+        accessKeyId: "ASIAUTHR3YDEHHWOP2T6", // Ganti dengan access key Anda
+        secretAccessKey: "HvV2+svmQVkRHFHBB+dnj6f0JsYEDzI30GNw3MPK", // Ganti dengan secret key Anda
+        sessionToken:
+        "IQoJb3JpZ2luX2VjEJP//////////wEaCXVzLXdlc3QtMiJIMEYCIQC3rEawEdOlzv1sLsoqlPHCjSrhgLiOxuLK/ZyBJ83aPQIhALpNQi6Vfe0OILXPFc3QvSL4JDTVfmozhs4fB0kHI7vGKr0CCPz//////////wEQARoMMzE2MTg3MzI4NzEyIgwaL0pBMKBrSvr+YywqkQK8u/uGY58II1HRAPux2Lcrz0vfesSpW6fYtrMGHt68zRYvomZZx4QmsmgY8kz7UAlqB6UqZ7JHBeOISgjFeztbLKnK5xbCD01Ofedq9IIXfJjz2SsF+Eo+XrsuqeYo2g/O79dn6kIRQB97sqXqnDCGAbk3pX7WFdJHcJNH59wVmtCZ30xBaL9SO4sG/qXAIm/Hs8FWU3A1GBvGoCw+P8np3A1vhEEYnHKstVxGq4m6+pQ1LaHDtQwRUoYO8Clc9vjFJdimH8sKkVfm3PrM0ccJdnp48F8k8339i7ClBYPAG6kLQfNRPx8Oqia/PVwuiXMY0lNytezqUQoTByvlWgrI01CLQHk6MfACojCMF4x+zhQwja/xuAY6nAEVTyNNHB5Zl0KZ78I/YX8C+6G28ZT8MfJbWaeOFPSVc4mFUSvwaDO1heC0dRULTSA1YfsnIHF9rBYApG6HaOakPpTz4VqeEeDlmsTculbKV5bM3tUNIyEw6VgzNTGqf+qPQSoEgMhhZ7MrVVzIYvcmsXERXPaJgq9+0Ih2kcQ4qr4OzZuDyjY0nmx06M5bBMU6h8WcVZvJx7186MU=",
+        region: "us-east-1",
+      });
+
+      const s3 = new AWS.S3();
+
+      document.getElementById("upload-button").onclick = function () {
+        const file = document.getElementById("file-upload").files[0];
+        const gender = document.getElementById("gender-select").value;
+        const age = document.getElementById("age-select").value;
+
+        if (!file) {
+          alert("Silakan pilih file untuk diupload.");
+          return;
+        }
+
+        const params = {
+          Bucket: "ukdwrobopark/Iklan",
+          Key: `${gender}/${age}/${file.name}`, // Menggunakan gender dan usia untuk menentukan path
+          Body: file,
+          //   ContentType: file.type, // Tambahkan ContentType untuk membantu S3 mengidentifikasi jenis file
+        };
+
+        s3.upload(params, function (err, data) {
+          if (err) {
+            console.error("Error uploading file:", err);
+            alert("Error uploading file: " + err.message);
+          } else {
+            console.log("File uploaded successfully:", data);
+            alert("File uploaded successfully! URL: " + data.Location);
+          }
+        });
+      };
+
+        document.getElementById("reset-button").addEventListener("click", function() {
+            document.getElementById("file-upload").value = "";
+            document.getElementById("gender-select").value = "Pria";
+            document.getElementById("age-select").value = "1-10";
+            alert("Form Telah Direset!");
+        });
+    </script>
+  </body>
+</html>

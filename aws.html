@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jasa Pengiklanan</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      header {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 0;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      h1 {
+        margin: 0;
+      }
+      .container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      select,
+      input[type="file"],
+      button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .reset-button {
+        background-color: #dc3545;
+      }
+      .reset-button:hover {
+        background-color: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Jasa Pengiklanan</h1>
+    </header>
+    <div class="container">
+      <h2>Upload Konten Anda</h2>
+      <div class="form-group">
+        <label for="file-upload">Pilih File:</label>
+        <input type="file" id="file-upload" />
+      </div>
+      <div class="form-group">
+        <label for="gender-select">Pilih Gender:</label>
+        <select id="gender-select">
+          <option value="Pria">Pria</option>
+          <option value="Wanita">Wanita</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="age-select">Pilih Rentang Usia:</label>
+        <select id="age-select">
+          <option value="1-10">1-10</option>
+          <option value="11-20">11-20</option>
+          <option value="21-30">21-30</option>
+          <option value="31-40">31-40</option>
+          <option value="41-50">41-50</option>
+          <option value="51-60">51-60</option>
+          <option value="61-70">61-70</option>
+          <option value="71-80">71-80</option>
+        </select>
+      </div>
+      <button id="upload-button">Upload</button>
+      <button class="reset-button" id="reset-button">Reset</button>
+    </div>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1040.0.min.js"></script>
+    <script>
+      // Konfigurasi AWS SDK
+      AWS.config.update({
+        accessKeyId: "ASIAUTHR3YDEPQEM4TMV", // Ganti dengan access key Anda
+        secretAccessKey: "NVgIXT0lyg7IIpu5ks6fYaJdPVYSFtxuXXYqjWrn", // Ganti dengan secret key Anda
+        sessionToken:
+          "IQoJb3JpZ2luX2VjEIL//////////wEaCXVzLXdlc3QtMiJIMEYCIQCQB7YNs0WAP5UkELws6TOwVKI+U3naCGTQ1AYhW1/nwAIhAPW6ENkqZ17tOuKKSVY1zEyW4ZrikVxZlG1yyyk94+X4Kr0CCOv//////////wEQARoMMzE2MTg3MzI4NzEyIgwo/GATEnPK4hSQE9YqkQKgBXa25p88KzvFHs3iXhzJWZMzKM5xGHZt/qJK60G2aSf7a66t+ufPHcGzI6XBIks69ouihdqhawMIt1Vm73lWYbXA9aOK30f45ofR1NxncmtaEBbH1mwuJpfWhzvbC3EXLmiZKEG0J6ANJS6TtrsfH6vMGUC4tGG6+u+TyhJgG+Nms5jltOfQurBpxOok/smM4RiYULDou1nhHCy8IVk02AyT2vxPcuceCkkRHOy1HuoHGb6Tpq9pZNtqGovYwmw5OPjwJ7cx4wD/tOj8nHopSuckW3TGlQznAUU8st2DB7uZBCAk7MMpBqyg0uPDxxNtNHtF9riyf3lfQkq1RW9sD+FwNG1mNvN3caF4hVOZIWswlNPtuAY6nAGqWYNvTtGcXacIdT47vyrxLfAuyDDSIvh9aYnEsz/xJg3i0oJz/WFkxQ1yVFkw7pdlzZNwhEBpjccaTlA1z2slLk41p7wwzCziqCmceNQKaYkztsD3uxHqsyRyQvs47UAty/ALIQhsOtwtJDq88MUV4BgfA7QIvMnwh2KqSt2oknSx2SzkvQXmb3lAKGwp7JoWH+9+MWXUD716yPk=",
+        region: "us-east-1",
+      });
+
+      const s3 = new AWS.S3();
+
+      document.getElementById("upload-button").onclick = function () {
+        const file = document.getElementById("file-upload").files[0];
+        const gender = document.getElementById("gender-select").value;
+        const age = document.getElementById("age-select").value;
+
+        if (!file) {
+          alert("Silakan pilih file untuk diupload.");
+          return;
+        }
+
+        const params = {
+          Bucket: "ukdwrobopark",
+          Key: `${gender}/${age}/${file.name}`, // Menggunakan gender dan usia untuk menentukan path
+          Body: file,
+          // Hapus parameter ACL di sini
+        };
+
+        s3.upload(params, function (err, data) {
+          if (err) {
+            console.error("Error uploading file:", err);
+            alert("Error uploading file: " + err.message);
+          } else {
+            console.log("File uploaded successfully:", data);
+            alert("File uploaded successfully! URL: " + data.Location);
+          }
+        });
+      };
+
+      document.getElementById("reset-button").onclick = function () {
+        document.getElementById("file-upload").value = "";
+        document.getElementById("gender-select").selectedIndex = 0;
+        document.getElementById("age-select").selectedIndex = 0;
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jasa Pengiklanan</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tambahkan Chart.js -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      header {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 0;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      h1 {
+        margin: 0;
+      }
+      .container,
+      .container2 {
+        background-color: white;
+        padding: 30px;
+        width: 45%;
+
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      select,
+      input[type="file"],
+      button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .reset-button {
+        background-color: #dc3545;
+      }
+      .reset-button:hover {
+        background-color: #c82333;
+      }
+      .headcontainer {
+        display: flex;
+        width: 90%;
+        margin: auto;
+        justify-content: center;
+        justify-content: space-around;
+      }
+      /* Tambahan CSS untuk chart */
+      .chart-container {
+        width: 100%;
+        height: 400px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Data UKDW X <strong> ROBOPARK </strong></h1>
+    </header>
+    <div class="headcontainer">
+      <div class="container">
+        <h2>Upload Konten Anda</h2>
+        <div class="form-group">
+          <label for="file-upload">Pilih File:</label>
+          <input type="file" id="file-upload" />
+        </div>
+        <div class="form-group">
+          <label for="gender-select">Pilih Gender:</label>
+          <select id="gender-select">
+            <option value="Pria">Pria</option>
+            <option value="Wanita">Wanita</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="age-select">Pilih Rentang Usia:</label>
+          <select id="age-select">
+            <option value="1-10">1-10</option>
+            <option value="11-20">11-20</option>
+            <option value="21-30">21-30</option>
+            <option value="31-40">31-40</option>
+            <option value="41-50">41-50</option>
+            <option value="51-60">51-60</option>
+            <option value="61-70">61-70</option>
+            <option value="71-80">71-80</option>
+          </select>
+        </div>
+        <button id="upload-button">Upload</button>
+        <button class="reset-button" id="reset-button">Reset</button>
+      </div>
+
+      <div class="container2">
+        <h2>Distribusi Data</h2>
+        <h2>
+          Total Data Masuk Hari Ini:
+          <span id="total-today">{{ data.total_today }}</span>
+        </h2>
+        <!-- Tambahkan ini -->
+        <div class="chart-container">
+          <canvas id="genderChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas id="usiaChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas id="emotionChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1040.0.min.js"></script>
+    <script>
+      // Konfigurasi AWS SDK dan upload function di sini...
+
+      // Ambil data dari Flask dan buat chart
+      const dataFromFlask = {{ data | tojson }}; // Ambil data dari Flask
+
+      const ctxGender = document.getElementById('genderChart').getContext('2d');
+      const ctxUsia = document.getElementById('usiaChart').getContext('2d');
+      const ctxEmotion = document.getElementById('emotionChart').getContext('2d');
+
+      const genderChart = new Chart(ctxGender, {
+          type: 'pie',
+          data: {
+              labels: dataFromFlask.gender.labels,
+              datasets: [{
+                  data: dataFromFlask.gender.values,
+                  backgroundColor: ['#36A2EB', '#FF6384'],
+                  hoverOffset: 4
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'top',
+                  },
+                  title: {
+                      display: true,
+                      text: 'Distribusi Gender'
+                  }
+              }
+          }
+      });
+
+      const usiaChart = new Chart(ctxUsia, {
+          type: 'pie',
+          data: {
+              labels: dataFromFlask.usia.labels,
+              datasets: [{
+                  data: dataFromFlask.usia.values,
+                  backgroundColor: [
+                      '#FF6384',
+                      '#36A2EB',
+                      '#FFCE56',
+                      '#4BC0C0',
+                      '#9966FF',
+                      '#FF9F40',
+                      '#C0C0C0',
+                      '#FFA07A'
+                  ],
+                  hoverOffset: 4
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'top',
+                  },
+                  title: {
+                      display: true,
+                      text: 'Distribusi Usia'
+                  }
+              }
+          }
+      });
+
+      const emotionChart = new Chart(ctxEmotion, {
+          type: 'pie',
+          data: {
+              labels: dataFromFlask.emotions.labels,
+              datasets: [{
+                  data: dataFromFlask.emotions.values,
+                  backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                  hoverOffset: 4
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'top',
+                  },
+                  title: {
+                      display: true,
+                      text: 'Distribusi Emosi'
+                  }
+              }
+          }
+      });
+    </script>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1040.0.min.js"></script>
+    <script>
+      // Konfigurasi AWS SDK
+      AWS.config.update({
+        accessKeyId: "ASIAUTHR3YDEKNVLFT7B", // Ganti dengan access key Anda
+        secretAccessKey: "0PpLZQt9UoLtxnCPZtDg+QlU+GSFOrQtioubOaL5", // Ganti dengan secret key Anda
+        sessionToken:
+          "IQoJb3JpZ2luX2VjEIn//////////wEaCXVzLXdlc3QtMiJGMEQCICGTPWIGNuWXdT7blPENrSxMNjBq7InPf+Qa3fTdjYBKAiAM7pXuUIwwvZzySdatViNiOWNErnr3PLHZXGYC8g7uBiq9Agjy//////////8BEAEaDDMxNjE4NzMyODcxMiIMSq85HjCyLQHJwRAYKpECSoSuvUxo5xa6I4OegMYBBhy8ilTV1vC3kRa9UB3W7MkdF2cQ7SPYXsQ5pZywQQm5hdCKvQunvkwwH3iBo1Pe6uvWr+UDYVOAYCZ4c8XCrfTtMrLgXHFeO2Tv1aXkIsiWyhjEa9vYqHlBIE79yNPj2BJm4iQISQWAIUAWgJ6zeSlPznX06117DZWKbGNDXKmoUNUvO7LU1JG/UZb7Gkgy0d5WMtXGg5NH4Fh4lTmXZy5rZEDnWpBzKypiqTy7kpamvEyBm6fePQssnqARWbdEFPivd/lY3vWf6jhDASXLI0hnPj6RJ5R6GQhE9ki7BMlPO0uufz6zWJND+GBD8aBIFTkC6/nalj5oqzwrxUy4bzH6MPGh77gGOp4Bd/jVRxrocHq/DA3OzMpX0ehEIpr4/Xfs96iVemmEQGCfpGOLJpgRP5Q50HEwQYxjOHnPVG2eGBhHuhSjd08STYvZ/NLJmzGX0T2hXpupt+I+HcytN3VHdq/vCSl8LR9S3sUJkmOdQS5xY5wVrlmNCiP8+hYYp1/g0IXQlJ8JGMO/UUyK5Gi+hTjszdLV/v5rlJ13av2VI6MWPgmxc4o=",
+        region: "us-east-1",
+      });
+
+      const s3 = new AWS.S3();
+
+      document.getElementById("upload-button").onclick = function () {
+        const file = document.getElementById("file-upload").files[0];
+        const gender = document.getElementById("gender-select").value;
+        const age = document.getElementById("age-select").value;
+
+        if (!file) {
+          alert("Silakan pilih file untuk diupload.");
+          return;
+        }
+
+        const params = {
+          Bucket: "ukdwrobopark/Iklan",
+          Key: `${gender}/${age}/${file.name}`, // Menggunakan gender dan usia untuk menentukan path
+          Body: file,
+          //   ContentType: file.type, // Tambahkan ContentType untuk membantu S3 mengidentifikasi jenis file
+        };
+
+        s3.upload(params, function (err, data) {
+          if (err) {
+            console.error("Error uploading file:", err);
+            alert("Error uploading file: " + err.message);
+          } else {
+            console.log("File uploaded successfully:", data);
+            alert("File uploaded successfully! URL: " + data.Location);
+          }
+        });
+      };
+
+      document.getElementById("reset-button").onclick = function () {
+        document.getElementById("file-upload").value = "";
+        document.getElementById("gender-select").selectedIndex = 0;
+        document.getElementById("age-select").selectedIndex = 0;
+      };
+    </script>
+  </body>
+</html>
